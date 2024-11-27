@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn-custom {
+    @apply btn btn-primary normal-case;
+  }
+
+  .card-custom {
+    @apply card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300;
+  }
+
+  .input-custom {
+    @apply input input-bordered w-full focus:input-primary;
+  }
+
+  .select-custom {
+    @apply select select-bordered w-full focus:select-primary;
+  }
+
+  .drawer-custom {
+    @apply drawer-side bg-base-200;
+  }
+
+  .navbar-custom {
+    @apply navbar bg-base-100/80 backdrop-blur-md shadow-md sticky top-0 z-50;
+  }
+
+  .footer-custom {
+    @apply btm-nav bg-base-100/80 backdrop-blur-md shadow-lg;
+  }
+
+  .stats-custom {
+    @apply stats shadow bg-base-100;
+  }
+
+  .avatar-custom {
+    @apply avatar placeholder;
+  }
+
+  .badge-custom {
+    @apply badge badge-primary;
+  }
+
+  .alert-custom {
+    @apply alert shadow-lg;
+  }
+
+  .modal-custom {
+    @apply modal modal-bottom sm:modal-middle;
+  }
+
+  .dropdown-custom {
+    @apply dropdown dropdown-end;
+  }
+
+  .menu-custom {
+    @apply menu bg-base-200 w-56 rounded-box;
+  }
+
+  .tooltip-custom {
+    @apply tooltip tooltip-primary;
+  }
+
+  .collapse-custom {
+    @apply collapse collapse-arrow bg-base-200;
+  }
+
+  .progress-custom {
+    @apply progress progress-primary;
+  }
+
+  .range-custom {
+    @apply range range-primary;
+  }
+}
