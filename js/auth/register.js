@@ -82,11 +82,12 @@ function handleRegister(e) {
       const successMessage = document.querySelector('#successMessage');
       successMessage.textContent = 'Registration successful! Redirecting to login...';
       successMessage.classList.remove('hidden');
+      alert('Registration successful! Redirecting to login...'); // Show success alert
       setTimeout(() => {
         window.location.hash = '#login';
       }, 2000);
     } else {
-      // Handle registration errorit 
+      // Handle registration error
       console.error('Registration failed:', data);
     }
   })
