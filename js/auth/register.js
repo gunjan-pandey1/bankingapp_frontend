@@ -76,22 +76,29 @@ function handleRegister(e) {
   .then(response => response.json())
   .then(data => {
     console.log(data);
-    if (data.success) {
+    // Check for successful registration message
+    if (data.message === 'Register successful') {
       // Handle successful registration
       console.log('Registration successful:', data);
       const successMessage = document.querySelector('#successMessage');
-      successMessage.textContent = 'Registration successful! Redirecting to login...';
+      successMessage.textContent = 'Registration successful!';
       successMessage.classList.remove('hidden');
       alert('Registration successful! Redirecting to login...'); // Show success alert
       setTimeout(() => {
         window.location.hash = '#login';
       }, 2000);
+    } else if (data.status === 'error' && data.message === 'Email already exists') {
+      // Handle existing email scenario
+      const existingUserName = data.existing_user_details?.name || 'Unknown';
+      alert(`Email already exists for user: ${existingUserName}. Please use a different email.`);
     } else {
-      // Handle registration error
+      // Handle other error scenarios
+      alert(data.message || 'Registration failed! Please try again.');
       console.error('Registration failed:', data);
     }
   })
   .catch(error => {
     console.error('Error:', error);
+    alert('An unexpected error occurred. Please try again.');
   });
 }

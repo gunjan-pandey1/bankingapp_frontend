@@ -5,6 +5,8 @@ export function renderLogin() {
       <div class="card bg-base-100 shadow-xl w-full max-w-md">
         <div class="card-body">
           <h2 class="card-title text-2xl font-bold text-center justify-center mb-6">Login</h2>
+          <div id="errorMessage" class="hidden text-center text-error mb-4"></div>
+          <div id="successMessage" class="hidden text-center text-success mb-4"></div>
           <form id="loginForm" class="space-y-4">
             <div class="form-control">
               <label class="label">
@@ -57,6 +59,12 @@ function handleLogin(e) {
   e.preventDefault();
   const email = document.querySelector('#email').value;
   const password = document.querySelector('#password').value;
+  
+  // Clear previous messages
+  const errorMessage = document.querySelector('#errorMessage');
+  const successMessage = document.querySelector('#successMessage');
+  errorMessage.classList.add('hidden');
+  successMessage.classList.add('hidden');
 
   fetch('http://127.0.0.1:8000/api/login', {
     method: 'POST',
@@ -67,17 +75,33 @@ function handleLogin(e) {
   })
   .then(response => response.json())
   .then(data => {
-    if (data.success) {
+    if (data.message === 'Login successful') {
       // Handle successful login
       console.log('Login successful:', data);
-      alert('Login successful!');
-      window.location.hash = '#dashboard';
+      successMessage.textContent = 'Login successful!';
+      successMessage.classList.remove('hidden');
+      
+      // Store the token if provided
+      localStorage.setItem('user', JSON.stringify({
+        token: data.token,
+        email: email,
+        isLoggedIn: true
+      }));
+      
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        window.location.hash = '#dashboard';
+      }, 1000);
     } else {
       // Handle login error
+      errorMessage.textContent = data.message || 'Login failed. Please check your credentials.';
+      errorMessage.classList.remove('hidden');
       console.error('Login failed:', data);
     }
   })
   .catch(error => {
     console.error('Error:', error);
+    errorMessage.textContent = 'An unexpected error occurred. Please try again.';
+    errorMessage.classList.remove('hidden');
   });
 }

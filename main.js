@@ -1,6 +1,7 @@
 import { renderLogin } from './js/auth/login.js';
 import { renderRegister } from './js/auth/register.js';
 import { renderForgotPassword } from './js/auth/forgot-password.js';
+import { renderResetPassword } from './js/auth/reset-password.js';
 import { renderDashboard } from './js/dashboard/dashboard.js';
 import { renderTransactions } from './js/dashboard/transactions.js';
 import { renderLoans } from './js/dashboard/loans.js';
@@ -17,17 +18,21 @@ function handleRoute() {
   const hash = window.location.hash || '#home';
   const isLoggedIn = localStorage.getItem('user');
 
+  console.log('Is Logged In:', isLoggedIn);
   if (!isLoggedIn && !['#register', '#forgot-password'].includes(hash)) {
     renderLogin();
-    return;
+    return; 
   }
-
+  console.log('Current Hash:', hash);
   switch (hash) {
     case '#register':
       renderRegister();
       break;
     case '#forgot-password':
       renderForgotPassword();
+      break;
+    case '#reset-password':
+      renderResetPassword();
       break;
     case '#transactions':
       renderTransactions();
