@@ -7,15 +7,13 @@ import { renderTransactions } from './js/dashboard/transactions.js';
 import { renderLoans } from './js/dashboard/loans.js';
 import { renderProfile } from './js/dashboard/profile.js';
 import { initializeTheme } from './js/utils/theme.js';
-import { renderHeader } from './js/components/header.js';
-import { renderFooter } from './js/components/footer.js';
 
 // Initialize theme
 initializeTheme();
 
 // Handle routing
 function handleRoute() {
-  const hash = window.location.hash || '#home';
+  const hash = window.location.hash || '#dashboard';
   const isLoggedIn = localStorage.getItem('user');
 
   console.log('Is Logged In:', isLoggedIn);

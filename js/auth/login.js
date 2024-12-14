@@ -59,49 +59,29 @@ function handleLogin(e) {
   e.preventDefault();
   const email = document.querySelector('#email').value;
   const password = document.querySelector('#password').value;
-  
-  // Clear previous messages
-  const errorMessage = document.querySelector('#errorMessage');
-  const successMessage = document.querySelector('#successMessage');
-  errorMessage.classList.add('hidden');
-  successMessage.classList.add('hidden');
 
   fetch('http://127.0.0.1:8000/api/login', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.message === 'Login successful') {
-      // Handle successful login
-      console.log('Login successful:', data);
-      successMessage.textContent = 'Login successful!';
-      successMessage.classList.remove('hidden');
-      
-      // Store the token if provided
-      localStorage.setItem('user', JSON.stringify({
-        token: data.token,
-        email: email,
-        isLoggedIn: true
-      }));
-      
-      // Redirect to dashboard after a short delay
-      setTimeout(() => {
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.message === 'Login successful') {
+        // Store tokens in localStorage
+        localStorage.setItem('accessToken', data.token);
+        localStorage.setItem('refreshToken', data.refresh_token);
+
+        // Redirect to dashboard
         window.location.hash = '#dashboard';
-      }, 1000);
-    } else {
-      // Handle login error
-      errorMessage.textContent = data.message || 'Login failed. Please check your credentials.';
-      errorMessage.classList.remove('hidden');
-      console.error('Login failed:', data);
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    errorMessage.textContent = 'An unexpected error occurred. Please try again.';
-    errorMessage.classList.remove('hidden');
-  });
+      } else {
+        alert(data.message || 'Login failed.');
+      }
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      alert('An unexpected error occurred.'); 
+    });
 }
