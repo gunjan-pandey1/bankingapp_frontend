@@ -73,6 +73,8 @@ function handleLogin(e) {
         // Store tokens in localStorage
         localStorage.setItem('accessToken', data.token);
         localStorage.setItem('refreshToken', data.refresh_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
 
         // Redirect to dashboard
         window.location.hash = '#dashboard';
