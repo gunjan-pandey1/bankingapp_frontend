@@ -23,15 +23,18 @@ function handleRoute() {
   }
   console.log('Current Hash:', hash);
   switch (hash) {
-    case '#register':
-      renderRegister();
-      break;
-    case '#forgot-password':
-      renderForgotPassword();
-      break;
-    case '#reset-password':
-      renderResetPassword();
-      break;
+      case '#register':
+        renderRegister();
+        break;
+      case '#login':
+        renderLogin();
+        break;
+      case '#forgot-password':
+        renderForgotPassword();
+        break;
+      case '#reset-password':
+        renderResetPassword();
+        break;
     case '#transactions':
       renderTransactions();
       break;

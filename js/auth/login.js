@@ -67,23 +67,31 @@ function handleLogin(e) {
     },
     body: JSON.stringify({ email, password }),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.message === 'Login successful') {
-        // Store tokens in localStorage
-        localStorage.setItem('accessToken', data.token);
-        localStorage.setItem('refreshToken', data.refresh_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-
-
+    .then((response) => {
+      if (!response.ok) {
+        // Handle HTTP errors
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((response) => {
+      if (response.success && response.message === 'Login successful') {
+        // Store tokens and user information in localStorage
+        localStorage.setItem('accessToken', response.data.token);
+        localStorage.setItem('refreshToken', response.data.refresh_token);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+  
         // Redirect to dashboard
         window.location.hash = '#dashboard';
       } else {
+        // Display error message from server or a default message
         alert(data.message || 'Login failed.');
       }
     })
     .catch((error) => {
+      // Log the error for debugging and notify the user
       console.error('Error:', error);
-      alert('An unexpected error occurred.'); 
+      alert('An unexpected error occurred.');
     });
+  
 }
