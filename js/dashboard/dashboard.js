@@ -6,7 +6,7 @@ export async function renderDashboard() {
   const token = localStorage.getItem('accessToken');
   const refreshToken = localStorage.getItem('refreshToken');
 
-  let creditScoreData = { score: 'Fetching...', details: '' };
+  let creditScoreData = { score: 'Fetching...', tickerId: 'Fetching...' };
   try {
     const response = await fetch('http://127.0.0.1:8000/api/dashboard', {
       method: 'GET',
@@ -26,10 +26,11 @@ export async function renderDashboard() {
     }
 
     const data = await response.json();
-    if (data.success) {
+    if (data.status) {
       creditScoreData = {
         score: data.data[0]?.credit_score || 'N/A',
         details: JSON.stringify(data.data),
+        tickerId: data.data?.tickerId || 'N/A',
       };
     } else {
       console.error('Failed to fetch credit score:', data.message);
@@ -44,11 +45,37 @@ export async function renderDashboard() {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="widget">
           <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Active Loans</h3>
+            <i class="fas fa-money-bill-wave text-primary text-xl"></i>
+          </div>
+          <p class="text-2xl font-bold mb-2">2 loans</p>
+          <p class="text-gray-600 dark:text-gray-400">Total: $25,000</p>
+        </div>
+
+        <div class="widget">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Next Payment</h3>
+            <i class="fas fa-calendar text-primary text-xl"></i>
+          </div>
+          <p class="text-2xl font-bold mb-2">$450</p>
+          <p class="text-gray-600 dark:text-gray-400">Due: March 15, 2024</p>
+        </div>
+
+        <div class="widget">
+          <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">Credit Score</h3>
             <i class="fas fa-chart-line text-primary text-xl"></i>
           </div>
-          <p class="text-2xl font-bold mb-2">${creditScoreData.score}</p>
-          <p class="text-gray-600 dark:text-gray-400">${creditScoreData.details}</p>
+          <p class="text-2xl font-bold mb-2">${creditScoreData.tickerId}</p>
+        </div>
+
+        <div class="widget">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold">Repayment</h3>
+            <i class="fas fa-credit-card text-primary text-xl"></i>
+          </div>
+          <p class="text-2xl font-bold mb-2">$450</p>
+          <button onclick="showRepaymentPage()" class="btn mt-2">Make Payment</button>
         </div>
       </div>
     </main>

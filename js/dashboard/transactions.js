@@ -23,6 +23,7 @@ export function renderTransactions() {
             <table class="table table-zebra">
               <thead class="sticky top-0 bg-base-100">
                 <tr>
+                  <th>Loan ID</th> <!-- New column -->
                   <th>Type</th>
                   <th>Description</th>
                   <th>Date</th>
