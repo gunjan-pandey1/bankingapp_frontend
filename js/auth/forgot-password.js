@@ -18,6 +18,7 @@ export function renderForgotPassword() {
           <div id="successMessage" class="hidden alert alert-success mb-4"></div>
           
           <form id="forgotForm" class="space-y-4">
+          
             <div class="form-control">
               <label class="label">
                 <span class="label-text">Email</span>

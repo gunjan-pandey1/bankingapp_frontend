@@ -1,9 +1,10 @@
 import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
 
+let banksData = [];
+let loansData = [];
 export async function renderLoans() {
   const app = document.querySelector('#app');
-  let loansData = [];
 
   try {
     const response = await fetch('http://127.0.0.1:8000/api/loans', {
@@ -15,9 +16,11 @@ export async function renderLoans() {
     });
 
     const result = await response.json();
-    
-    if (result.status === 'success' && Array.isArray(result.data)) {
-      loansData = result.data;
+    console.log(result);
+    if (result.status) {
+      console.log(result.data);
+      loansData = result.data.loans;
+      banksData = result.data.banks;
     } else {
       console.error('Failed to fetch loans:', result.message);
     }
@@ -45,14 +48,14 @@ export async function renderLoans() {
             <div class="card-body">
               <div class="flex justify-between items-center">
                 <h3 class="card-title">${loan.type}</h3>
-                <div class="badge ${loan.status.toLowerCase() === 'active' ? 'badge-success' : 'badge-warning'} gap-2">
+                <div class="badge ${String(loan.status).toLowerCase() === 'active' ? 'badge-success' : 'badge-warning'} gap-2">
                   ${loan.status}
                 </div>
               </div>
               <div class="space-y-2 my-4">
                 <p class="flex justify-between">
                   <span class="text-base-content/70">Amount:</span>
-                  <span class="font-semibold">$${loan.amount}</span>
+                  <span class="font-semibold">${loan.amount}</span>
                 </p>
                 <p class="flex justify-between">
                   <span class="text-base-content/70">Interest:</span>
@@ -68,7 +71,7 @@ export async function renderLoans() {
                 </p>
               </div>
               <div class="card-actions justify-end">
-                <button class="btn btn-primary" onclick="showLoanDetails('${loan.type}', ${loan.amount})">
+                <button class="btn btn-primary" onclick="showLoanDetails('${loan.type}', ${loan.amount}, ${loan.loan_id})">
                   View Details
                 </button>
               </div>
@@ -86,7 +89,8 @@ export async function renderLoans() {
 }
 
 // Keep existing showLoanDetails function unchanged
-window.showLoanDetails = (type, amount) => {
+window.showLoanDetails = (type, amount, loanId) => {
+  console.log('Banks Data:', banksData);
   const app = document.querySelector('#app');
   app.innerHTML = `
     ${renderHeader()}
@@ -98,20 +102,19 @@ window.showLoanDetails = (type, amount) => {
             <div class="space-y-6">
               <div class="alert alert-info">
                 <i class="fas fa-info-circle"></i>
-                <span>Loan Amount: $${amount}</span>
+                <span>Loan Amount: ${amount}</span>
               </div>
 
               <div class="form-control">
                 <label class="label">
                   <span class="label-text">Select Bank</span>
                 </label>
-                <select id="bank" class="select select-bordered w-full">
-                  <option value="">Select a bank</option>
-                  <option value="bank1">Bank of America</option>
-                  <option value="bank2">Chase Bank</option>
-                  <option value="bank3">Wells Fargo</option>
-                  <option value="bank4">Citibank</option>
-                </select>
+                  <select id="bank" class="select select-bordered w-full">
+                    <option value="">Select a bank</option>
+                    ${banksData.length > 0 ? banksData.map(bank => `
+                      <option value="${bank.id}">${bank.bankName}</option>
+                    `).join('') : '<option value="">No banks available</option>'}
+                  </select>
               </div>
 
               <div class="form-control">
@@ -119,6 +122,7 @@ window.showLoanDetails = (type, amount) => {
                   <span class="label-text">Loan Tenure</span>
                   <span class="label-text-alt" id="tenureValue">6 months</span>
                 </label>
+                <input type='hidden' id='loanId' value='${loanId}' />
                 <input type="range" id="tenure" min="2" max="18" value="6" class="range range-primary" step="1" />
                 <div class="w-full flex justify-between text-xs px-2 mt-2">
                   <span>2m</span>
@@ -141,36 +145,51 @@ window.showLoanDetails = (type, amount) => {
     ${renderFooter('loans')}
   `;
 
-  document.querySelector('#tenure').addEventListener('input', (e) => {
-    document.querySelector('#tenureValue').textContent = `${e.target.value} months`;
-  });
+document.querySelector('#tenure').addEventListener('input', (e) => {
+  document.querySelector('#tenureValue').textContent = `${e.target.value} months`;
+});
 };
 
-// Keep existing handleLoanApplication function unchanged
-window.handleLoanApplication = () => {
-  const app = document.querySelector('#app');
-  app.innerHTML = `
-    ${renderHeader()}
-    <main class="flex-1 container mx-auto px-4 py-8">
-      <div class="max-w-md mx-auto text-center">
-        <div class="card bg-base-100 shadow-xl">
-          <div class="card-body items-center">
-            <div class="text-success text-6xl mb-4">
-              <i class="fas fa-check-circle"></i>
-            </div>
-            <h2 class="card-title text-2xl mb-4">Application Successful!</h2>
-            <p class="text-base-content/70 mb-6">
-              Your loan application has been submitted successfully.
-            </p>
-            <div class="card-actions">
-              <button class="btn btn-primary" onclick="location.hash = '#home'">
-                Back to Home
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-    ${renderFooter('loans')}
-  `;
+window.handleLoanApplication = async () => {
+  const bank = document.querySelector('#bank').value;
+  console.log(bank);
+  if (!bank) {
+    alert('Please select a bank before proceeding.');
+    return;
+  }
+  const tenure = document.querySelector('#tenure').value;
+  const loanType = document.querySelector('.card-title').textContent.replace(' Details', '');
+  const loanAmount = document.querySelector('.alert-info span').textContent.replace('Loan Amount: ', '');
+  const loanId = document.querySelector('#loanId').value;
+
+  try {
+    console.log('Loan ID:', loanId);
+    const response = await fetch('http://127.0.0.1:8000/api/loanViewDetails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        bank: bank,
+        tenure: tenure,
+        loan_type: loanType,
+        loan_amount: loanAmount,
+        loan_id: loanId,
+ 
+      })
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      location.hash = '#transactions';
+    } else {
+      alert(result.message || 'Failed to process loan application');
+    }
+  } catch (error) {
+    console.error('Error submitting loan application:', error);
+    alert('Failed to process loan application');
+  }
 };
